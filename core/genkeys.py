@@ -10,24 +10,12 @@ _ctx.armor=True
 full_use_param = """
 <GnupgKeyParms format="internal">
 Key-Type: RSA
-Key-Length: 4096
+Key-Length: %(keysize)s
 Name-Real: %(name)s
 Name-Comment: %(comment)s
 Name-Email: %(email)s
 Expire-Date: 0
 Passphrase: %(passphrase)s
-</GnupgKeyParms>
-"""
-
-signing_only_param = """
-<GnupgKeyParms format="internal">
-  Key-Type: RSA
-  Key-Usage: sign
-  Key-Length: 1024
-  Name-Real: Testing
-  Name-Comment: comment
-  Name-Email: someone@example.com
-  Expire-Date: 0
 </GnupgKeyParms>
 """
 
@@ -38,11 +26,12 @@ def gen_keypair(name, email, comment, passphrase):
     params = full_use_param % {"name": name,
                                "email": email,
                                "comment": comment,
-                               "passphrase": passphrase}
-    
-    keypair = _ctx.genkey(params)
+                               "passphrase": passphrase,
+                               "keysize": 4096} # TODO: allow
+                                                # changing?
+    result = _ctx.genkey(params)
 
-    return keypair
+    return result
 
 if __name__ == "__main__":
     

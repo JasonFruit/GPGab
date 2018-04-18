@@ -31,7 +31,7 @@ class User(object):
                         subkey.expired or
                         subkey.disabled):
                     if subkey.secret:
-                        _ctx.export_secret(subkey.fpr, f)
+                        _ctx.export(subkey.fpr, f, True)
                         return True
         return False
     
