@@ -7,7 +7,7 @@ import gpgme
 _ctx = gpgme.Context()
 _ctx.armor=True
 
-full_use_param = """
+_full_use_param = """
 <GnupgKeyParms format="internal">
 Key-Type: RSA
 Key-Length: %(keysize)s
@@ -23,12 +23,13 @@ def gen_keypair(name, email, comment, passphrase):
     """Generate a new public and private key for the specified user info,
     locked with `passphrase`"""
     
-    params = full_use_param % {"name": name,
-                               "email": email,
-                               "comment": comment,
-                               "passphrase": passphrase,
-                               "keysize": 4096} # TODO: allow
-                                                # changing?
+    params = _full_use_param % {"name": name,
+                                "email": email,
+                                "comment": comment,
+                                "passphrase": passphrase,
+                                "keysize": 4096} # TODO: allow
+                                                 # changing?
+    
     result = _ctx.genkey(params)
 
     return result

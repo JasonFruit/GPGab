@@ -8,6 +8,7 @@ _ctx = gpgme.Context()
 _ctx.armor=True
 
 class User(object):
+    """Represents a user of the communications system"""
     def __init__(self, gpg_uid, key):
         self.email = gpg_uid.email
         self.name = gpg_uid.name
@@ -15,6 +16,9 @@ class User(object):
         self.key = key
         
     def export_public_key(self, fn):
+        """Export the user's public key to an ascii-armored file at `fn`"""
+
+        # look for a valid subkey
         with open(fn, "wb") as f:
             for subkey in self.key.subkeys:
                 if not (subkey.invalid or
@@ -25,6 +29,9 @@ class User(object):
         return False
     
     def export_private_key(self, fn):
+        """Export the user's private key to an ascii-armored file at `fn`"""
+
+        # look for a subkey that's valid and secret
         with open(fn, "wb") as f:
             for subkey in self.key.subkeys:
                 if not (subkey.invalid or
@@ -36,6 +43,8 @@ class User(object):
         return False
     
     def public_key(self):
+        """Return an ascii-armored string of the user's public key"""
+        
         bio = BytesIO()
         
         for subkey in self.key.subkeys:
@@ -46,10 +55,16 @@ class User(object):
         return None
     
     def __repr__(self):
+        """Make a comprehensible representation of the user's info"""
+        
         return "%s (%s) <%s>" % (self.name, self.comment, self.email)
 
-def contacts(query=None, secret=False):
+def _users(query=None, secret=False):
+    """Return a list of users that contain the specified query elements,
+    and who have secret or public keys as specified"""
+    
     out = []
+    
     if query:
         keys = _ctx.keylist(query, secret)
     else:
@@ -61,8 +76,18 @@ def contacts(query=None, secret=False):
             
     return out
 
+def contacts(query=None):
+    """Return a list of users with public keys which match the specified
+    query
+
+    """
+    return _users(query, secret=False)
+
 def identities(query=None):
-    return contacts(query, secret=True)
+    """Return a list of users with private keys which match the
+    specified query
+    """
+    return _users(query, secret=True)
 
 if __name__ == "__main__":
     print(identities()[0].public_key())
